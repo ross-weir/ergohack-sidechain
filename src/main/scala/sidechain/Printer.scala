@@ -23,6 +23,8 @@ object Constants {
   val sidechainStateAddress = getAddressFromErgoTree(sidechainStateErgoTree)
 
   val transferUnlockContract = scala.io.Source.fromFile("contracts/MainChain/TransferUnlock.es", "utf-8").getLines.mkString("\n")
+  val transferUnlockErgoTree = compile(transferUnlockContract)
+  val transferUnlockAddress = getAddressFromErgoTree(transferUnlockErgoTree)
 
 }
 
@@ -30,4 +32,5 @@ object Printer extends App {
   import Constants._
 
   println(s"Sidechain state contract address: ${sidechainStateAddress}")
+  println(s"Transfer unlock contract address: ${transferUnlockAddress}")
 }
