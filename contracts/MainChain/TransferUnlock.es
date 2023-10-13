@@ -10,7 +10,6 @@
 
    if(unlockStartHash.isDefined) {
      val sidechainConfs = 50
-     // todo: check that enough confs
 
      val committedHeight = getVar[Long](0).get
      val chT = getVar[Coll[Byte]](1).get
