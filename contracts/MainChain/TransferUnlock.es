@@ -9,7 +9,8 @@
    val unlockStartHash = SELF.R4[Coll[Byte]]
 
    if(unlockStartHash.isDefined) {
-     sigmaProp(true)
+     val heightMet = SELF.R5[Int].get > HEIGHT
+     sigmaProp(heightMet)
    } else {
      // starting unlock
 
