@@ -3,7 +3,7 @@ package sidechain
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 
-class MainChain extends AnyFlatSpec with should.Matchers {
+class MainChainSpec extends AnyFlatSpec with should.Matchers {
   "lock" should "lock user ERGs" {
 
   }
