@@ -14,5 +14,5 @@ libraryDependencies ++= Seq(
   "org.scala-lang.modules" %% "scala-parser-combinators" % "2.2.0",
   "org.scalactic" %% "scalactic" % "3.2.15",
   "org.scalatest" %% "scalatest" % "3.2.15" % "test",
-  "org.ergoplatform" %% "ergo-appkit" % "5.0.1"
+  "org.ergoplatform" %% "ergo-appkit" % "5.0.3"
 )
