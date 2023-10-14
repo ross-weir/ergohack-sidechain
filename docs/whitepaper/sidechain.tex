@@ -1,0 +1,85 @@
+\documentclass{article}   % list options between brackets
+
+\usepackage{color}
+\usepackage{graphicx}
+%% The amssymb package provides various useful mathematical symbols
+\usepackage{amssymb}
+%% The amsthm package provides extended theorem environments
+%\usepackage{amsthm}
+\usepackage{amsmath}
+
+\usepackage{listings}
+
+\usepackage{hyperref}
+
+\usepackage{systeme}
+
+\def\shownotes{1}
+\def\notesinmargins{0}
+
+\ifnum\shownotes=1
+\ifnum\notesinmargins=1
+\newcommand{\authnote}[2]{\marginpar{\parbox{\marginparwidth}{\tiny %
+  \textsf{#1 {\textcolor{blue}{notes: #2}}}}}%
+  \textcolor{blue}{\textbf{\dag}}}
+\else
+\newcommand{\authnote}[2]{
+  \textsf{#1 \textcolor{blue}{: #2}}}
+\fi
+\else
+\newcommand{\authnote}[2]{}
+\fi
+
+\newcommand{\knote}[1]{{\authnote{\textcolor{green}{kushti notes}}{#1}}}
+\newcommand{\mnote}[1]{{\authnote{\textcolor{red}{scalahub notes}}{#1}}}
+
+\usepackage[dvipsnames]{xcolor}
+\usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
+
+
+% type user-defined commands here
+\usepackage[T1]{fontenc}
+
+\usepackage{flushend}
+
+
+\newcommand{\ma}{\mathcal{A}}
+\newcommand{\mb}{\mathcal{B}}
+\newcommand{\he}{\hat{e}}
+\newcommand{\sr}{\stackrel}
+\newcommand{\ra}{\rightarrow}
+\newcommand{\la}{\leftarrow}
+\newcommand{\state}{state}
+
+\newcommand{\ignore}[1]{} 
+\newcommand{\full}[1]{}
+\newcommand{\notfull}[1]{#1}
+\newcommand{\rand}{\stackrel{R}{\leftarrow}}
+\newcommand{\mypar}[1]{\smallskip\noindent\textbf{#1.}}
+
+\begin{document}
+
+\title{Two-Way Pegged Sidechains On Ergo (ErgoHack Report)}
+\author{kushti, soysor}
+
+
+\maketitle
+
+\begin{abstract}
+In this report we outline some ways to implement sidechains on Ergo with smart contract powered transfers, where both main and
+  side chains are based on UTXOs and support ErgoTree (in its current form, at the same time, sidechain may support more features).
+In such setting, transfer from sidechain and back can be done via on-chain contract, then security issues are reduced to
+  sidechain consensus issue only.
+\end{abstract}
+
+
+\section{Introduction}
+
+
+
+
+\newpage
+\bibliography{sources}
+\bibliographystyle{ieeetr} 
+
+\end{document}
