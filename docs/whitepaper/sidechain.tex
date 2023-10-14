@@ -66,7 +66,7 @@
 \maketitle
 
 \begin{abstract}
-In this report we outline some ways to implement sidechains on Ergo with smart contract powered transfers, where both main and
+In this report we outline some ways to implement pegged sidechains on Ergo with smart contract powered transfers, where both main and
   side chains are based on UTXOs and support ErgoTree (in its current form, at the same time, sidechain may support more features).
 In such setting, transfer from sidechain and back can be done via on-chain contract, then security issues are reduced to
   sidechain consensus issue only.
@@ -75,6 +75,30 @@ In such setting, transfer from sidechain and back can be done via on-chain contr
 
 \section{Introduction}
 
+A sidechain~\cite{back2014enabling} is a secondary blockchain connected to the main blockchain with a two-way peg.
+Pegged sidechains enable ERG (native cryptocurrency of the Ergo blockchain) and other Ergo blockchain assets to be
+transferred between multiple Ergo-like blockchains. Sidechains can be considered as playgrounds for experimental features,
+or scalability solution, allowing to off-load transaction from the main chain to sidechains.
+
+
+
+\subsection{Ergo blockchain details}
+
+We provide relevant Ergo blockchain needed here.
+
+\section{Sidechain Data on the Mainnet}
+
+\subsection{Merged-Mined Sidechains}
+
+\section{Transfers}
+
+\subsection{Mainchain to Sidechain}
+
+\subsection{Sidechain to Mainchain}
+
+\section{Evaluation}
+
+\section{Further Work}
 
 
 
