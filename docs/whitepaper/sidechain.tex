@@ -83,7 +83,13 @@ techniques), allowing to off-load transaction from the main chain to sidechains.
 
 \subsection{Ergo blockchain details}
 
-We provide relevant Ergo blockchain needed here.
+We provide relevant Ergo blockchain needed here. Prior knowledge of UTXO accounting model, Bitcoin, data structures etc
+is needed.
+\begin{itemize}
+\item{} Ergo has UTXO set commitments, so set of unspent outputs after processing transactions in a block is committed via
+authenticated AVL+ tree, with tree digest included into a block header.
+\item{} Last headers as well as some fields from upcoming header can be read from a contract.
+\end{itemize}
 
 \section{Sidechain Data on the Mainnet}
 
