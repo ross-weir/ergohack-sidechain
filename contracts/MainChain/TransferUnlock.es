@@ -16,15 +16,15 @@
      val chU = getVar[Coll[Byte]](2).get
      val chChainDigest = getVar[Coll[Byte]](3).get
 
-     val committedHeightHash = longToByteArray(committedHeight)
+     val committedHeightBytes = longToByteArray(committedHeight)
 
-     val chHash = blake2b256(committedHeightHash ++ chT ++ chU ++ chChainDigest)
+     val chHash = blake2b256(committedHeightBytes ++ chT ++ chU ++ chChainDigest)
      val proof = getVar[Coll[Byte]](4).get
      val chainTree = getVar[AvlTree](5).get
 
      val properTree = chainTree.digest.slice(0,32) == sideChainState.R7[Coll[Byte]].get
 
-     val treeContainsCommittedHash = chainTree.get(committedHeightHash, proof).get == chHash
+     val treeContainsCommittedHash = chainTree.get(committedHeightBytes, proof).get == chHash
 
      val mainchainHeightMet = SELF.R5[Int].get > HEIGHT
      val enoughSidechainConfs = (sideChainState.R4[Long].get - committedHeight) > 50
@@ -46,7 +46,23 @@
         outHeight <= HEIGHT &&
         outHeight >= HEIGHT - 5
 
-     sigmaProp(validTransition)
+     val stateTree = getVar[AvlTree](0).get
+     val properStateTree = stateTree.digest.slice(0,32) == sideChainState.R6[Coll[Byte]].get
+
+     val sidechainBox = getVar[Box](1).get
+     val boxId = sidechainBox.id
+     val boxBytes = sidechainBox.bytes
+
+     val sidechainBoxProof = getVar[Coll[Byte]](2).get
+
+     val properBox = stateTree.get(boxId, sidechainBoxProof).get == boxBytes
+
+     val properScript = sidechainBox.propositionBytes == fromBase64("") // todo: false contract
+
+     // check that sidechain box contains enough sERG sidechain tokens
+     val properAmount = sidechainBox.tokens(0)._1 == fromBase64("") && sidechainBox.tokens(0)._2 <= SELF.value  // todo: sERG id
+
+     sigmaProp(validTransition && properStateTree && properBox && properScript && properAmount)
    }
 
 }
