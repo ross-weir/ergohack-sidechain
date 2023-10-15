@@ -8,6 +8,7 @@
 
    val unlockStartHash = SELF.R4[Coll[Byte]]
 
+   //todo: add refund path
    if(unlockStartHash.isDefined) {
      val sidechainConfs = 50
 
