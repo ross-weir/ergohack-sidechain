@@ -27,7 +27,7 @@
      val treeContainsCommittedHash = chainTree.get(committedHeightBytes, proof).get == chHash
 
      val mainchainHeightMet = SELF.R5[Int].get > HEIGHT
-     val enoughSidechainConfs = (sideChainState.R4[Long].get - committedHeight) > 50
+     val enoughSidechainConfs = (sideChainState.R4[Long].get - committedHeight) > sidechainConfs
      sigmaProp(mainchainHeightMet && properTree && treeContainsCommittedHash && enoughSidechainConfs)
    } else {
      // starting unlock
