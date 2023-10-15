@@ -4,10 +4,13 @@
    // R4 - sidechain's last data id (hash) during unlock start
    // R5 - approx mainchain HEIGHT at unlock moment
 
+   val doubleUnlockPreventionContractNFT = fromBase64("") // todo: inject
+
    val sideChainState: Box = CONTEXT.dataInputs(0)
 
    val unlockStartHash = SELF.R4[Coll[Byte]]
 
+   //todo: add refund path
    if(unlockStartHash.isDefined) {
      val sidechainConfs = 50
 
@@ -62,7 +65,11 @@
      // check that sidechain box contains enough sERG sidechain tokens
      val properAmount = sidechainBox.tokens(0)._1 == fromBase64("") && sidechainBox.tokens(0)._2 <= SELF.value  // todo: sERG id
 
-     sigmaProp(validTransition && properStateTree && properBox && properScript && properAmount)
+     val doubleUnlockContractOutput = OUTPUTS(1)
+     val doubleUnlockUpdated = doubleUnlockContractOutput.tokens(0)._1 == doubleUnlockPreventionContractNFT &&
+                                    doubleUnlockContractOutput.R5[Coll[Byte]].get == boxId
+
+     sigmaProp(validTransition && properStateTree && properBox && properScript && properAmount && doubleUnlockUpdated)
    }
 
 }
