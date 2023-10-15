@@ -17,7 +17,8 @@
 
     // ensure enough confs
     val unlockStateProof = getVar[Coll[Byte]](2).get
-    val lockStartHeight = unlockState.get(mainchainBox.id, unlockStateProof).get
+    val lockStartHeightBytes = unlockState.get(mainchainBox.id, unlockStateProof).get
+    val lockStartHeight = byteArrayToLong(lockStartHeightBytes)
     val enoughConfs = (HEIGHT - lockStartHeight) >= 50
 
     // ensure mainchain box provided still exists in utxo set
