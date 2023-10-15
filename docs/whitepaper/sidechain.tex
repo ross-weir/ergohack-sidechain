@@ -130,21 +130,31 @@ this requirement can be relaxed further though.
 There are some assumptions we have for simplifying contracts:
 \begin{itemize}
   \item sidechain has no storage rent
-  \item sidechain consensus rules require that during input script validatin, for context variable #125 only mainchain
+  \item sidechain consensus rules require that during input script validatin, for context variable \# 125 only mainchain;
+        state digest can be provided
 \end{itemize}
 
+Then contracts-powered transfers from main-chain to side-chain and back are done as follows:
 
-\subsection{Mainchain to Sidechain}
+\begin{enumerate}
+  \item user sends $E$ ERG to a contract which is allowing to unlock them when there is a box on the sidechain with
+  at least $E$ sERG locked forever (with ${false}$ contract in simplest case, when there's no storage rent on the sidechain);
+  unlock may happen after enough main-chain confirmations.
 
-\subsection{Sidechain to Mainchain}
+  \item as mainchain state digest can read in sidechain contracts (in our case, via context variable \# 125 ), sidechain
+  contract holding all the sERGs initially, may unlock them when main-chain box is in the UTXO state for enough
+  side-chain confirmations.
+\end{enumerate}
 
 \section{Security}
 
+As transfers are based on contracts, sidechaining security is reduced to consensus.  \knote{to be continued}
+
 \section{Evaluation}
 
+\knote{Fill with tests data}
+
 \section{Further Work}
-
-
 
 \newpage
 \bibliography{sources}
