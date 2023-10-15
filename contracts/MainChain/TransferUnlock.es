@@ -9,7 +9,26 @@
    val unlockStartHash = SELF.R4[Coll[Byte]]
 
    if(unlockStartHash.isDefined) {
-     sigmaProp(true)
+     val sidechainConfs = 50
+
+     val committedHeight = getVar[Long](0).get
+     val chT = getVar[Coll[Byte]](1).get
+     val chU = getVar[Coll[Byte]](2).get
+     val chChainDigest = getVar[Coll[Byte]](3).get
+
+     val committedHeightHash = longToByteArray(committedHeight)
+
+     val chHash = blake2b256(committedHeightHash ++ chT ++ chU ++ chChainDigest)
+     val proof = getVar[Coll[Byte]](4).get
+     val chainTree = getVar[AvlTree](5).get
+
+     val properTree = chainTree.digest.slice(0,32) == sideChainState.R7[Coll[Byte]].get
+
+     val treeContainsCommittedHash = chainTree.get(committedHeightHash, proof).get == chHash
+
+     val mainchainHeightMet = SELF.R5[Int].get > HEIGHT
+     val enoughSidechainConfs = (sideChainState.R4[Long].get - committedHeight) > 50
+     sigmaProp(mainchainHeightMet && properTree && treeContainsCommittedHash && enoughSidechainConfs)
    } else {
      // starting unlock
 

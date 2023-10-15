@@ -1,0 +1,140 @@
+\documentclass{article}   % list options between brackets
+
+\usepackage{color}
+\usepackage{graphicx}
+%% The amssymb package provides various useful mathematical symbols
+\usepackage{amssymb}
+%% The amsthm package provides extended theorem environments
+%\usepackage{amsthm}
+\usepackage{amsmath}
+
+\usepackage{listings}
+
+\usepackage{hyperref}
+
+\usepackage{systeme}
+
+\def\shownotes{1}
+\def\notesinmargins{0}
+
+\ifnum\shownotes=1
+\ifnum\notesinmargins=1
+\newcommand{\authnote}[2]{\marginpar{\parbox{\marginparwidth}{\tiny %
+  \textsf{#1 {\textcolor{blue}{notes: #2}}}}}%
+  \textcolor{blue}{\textbf{\dag}}}
+\else
+\newcommand{\authnote}[2]{
+  \textsf{#1 \textcolor{blue}{: #2}}}
+\fi
+\else
+\newcommand{\authnote}[2]{}
+\fi
+
+\newcommand{\knote}[1]{{\authnote{\textcolor{green}{kushti notes}}{#1}}}
+\newcommand{\mnote}[1]{{\authnote{\textcolor{red}{scalahub notes}}{#1}}}
+
+\usepackage[dvipsnames]{xcolor}
+\usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
+
+
+% type user-defined commands here
+\usepackage[T1]{fontenc}
+
+\usepackage{flushend}
+
+
+\newcommand{\ma}{\mathcal{A}}
+\newcommand{\mb}{\mathcal{B}}
+\newcommand{\he}{\hat{e}}
+\newcommand{\sr}{\stackrel}
+\newcommand{\ra}{\rightarrow}
+\newcommand{\la}{\leftarrow}
+\newcommand{\state}{state}
+
+\newcommand{\ignore}[1]{} 
+\newcommand{\full}[1]{}
+\newcommand{\notfull}[1]{#1}
+\newcommand{\rand}{\stackrel{R}{\leftarrow}}
+\newcommand{\mypar}[1]{\smallskip\noindent\textbf{#1.}}
+
+\begin{document}
+
+\title{Two-Way Pegged Sidechains On Ergo (ErgoHack Report)}
+\author{kushti, soysor}
+
+
+\maketitle
+
+\begin{abstract}
+In this report we outline some ways to implement pegged sidechains on Ergo with smart contract powered transfers, where both main and
+  side chains are based on UTXOs and support ErgoTree (in its current form, at the same time, sidechain may support more features).
+In such setting, transfer from sidechain and back can be done via on-chain contract, then security issues are reduced to
+  sidechain consensus issue only.
+\end{abstract}
+
+
+\section{Introduction}
+
+A sidechain~\cite{back2014enabling} is a secondary blockchain connected to the main blockchain with a two-way peg.
+Pegged sidechains enable ERG (native cryptocurrency of the Ergo blockchain) and other Ergo blockchain assets to be
+transferred between multiple Ergo-like blockchains. Sidechains can be considered as playgrounds for experimental features,
+or scalability solution~(for example, a sidechain may support shielded transactions or other privacy-preserving
+techniques), allowing to off-load transaction from the main chain to sidechains.
+
+\subsection{Ergo blockchain details}
+
+We provide relevant Ergo blockchain needed here. Prior knowledge of UTXO accounting model, Bitcoin, data structures etc
+is needed.
+\begin{itemize}
+\item{} Ergo has UTXO set commitments, so set of unspent outputs after processing transactions in a block is committed via
+authenticated AVL+ tree, with tree digest included into a block header.
+\item{} Last headers as well as some fields from upcoming header can be read from a contract.
+\end{itemize}
+
+\section{Sidechain Data on the Mainnet}
+
+In this section we consider how sidechain data can be stored on the main-chain.
+
+A sidechain progress can be represented in the simplest form as a tuple $(h, T_h, U_h, C_h)$, where
+$h$ is a sidechain height, $T_h$ are state changes (transactions) done in $h$, $U_h$ is digest of AVL+ tree built on top
+of UTXO set after processing the changes $T_h$, $C_h$ is AVL+ tree which contains all the previous sidechain states in form
+of key-value pairs $h -> hash(h || T_h || U_{h-1})$.
+
+First of all, we need to write this minimal data somewhere, to read in contracts later. Currently, we can think about two options:
+
+\begin{itemize}
+\item{} there's extension section of a block, which contains key -> value pairs, and root of a Merkle tree built upon the pairs is included into a
+block header (and can be read by a contract). We can include different sidechains here, or even a tree built on top of sidechains. The only issue with this approach is that Merkle trees are not supported in ErgoTree/Script yet
+
+\item{} we can just put sidechain data into a box identified by some NFT
+\end{itemize}
+
+\subsection{Sidechain Consensus}
+
+
+There could be different option how sidechain can make a progress
+\begin{itemize}
+\item{} merged mining - PoW fields (nonce, solution) to be added to the tuple, and writted on the Ergo blockchain. Then sidechain header would be Ergo block header + extension Merkle path or path to box in UTXO set tree + sidechain tuple with PoW data. Security: subset of Ergo miners (so honest majority amongst them)
+
+\item{} if sidechain data is in a box, we can make the box spendable for an Ergo block miner (by using miner pubkey from context like done in emission contract). Security: subset of Ergo miners (so honest majority amongst them). There could be other options here (multisig etc)
+\end{itemize}
+
+\section{Transfers}
+
+\subsection{Mainchain to Sidechain}
+
+\subsection{Sidechain to Mainchain}
+
+\section{Security}
+
+\section{Evaluation}
+
+\section{Further Work}
+
+
+
+\newpage
+\bibliography{sources}
+\bibliographystyle{ieeetr} 
+
+\end{document}
