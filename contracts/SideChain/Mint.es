@@ -2,7 +2,7 @@
   // SideChain claiming sERG contract
 
   val mainchainUtxoState = getVar[AvlTree](125).get
-  val mainchainUtxoProof = getVar[Coll[Byte]](126).get
+  val mainchainUtxoProof = getVar[Coll[Byte]](124).get
 
   val successor = OUTPUTS(0)
   val transferUnlockBox = OUTPUTS(1)

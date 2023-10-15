@@ -43,7 +43,8 @@
         selfOutput.propositionBytes == SELF.propositionBytes &&
         selfOutput.tokens == SELF.tokens &&
         selfOutput.R4[Coll[Byte]].get == sideChainStateHash &&
-        outHeight >= HEIGHT + 5
+        outHeight <= HEIGHT &&
+        outHeight >= HEIGHT - 5
 
      val stateTree = getVar[AvlTree](0).get
      val properStateTree = stateTree.digest.slice(0,32) == sideChainState.R6[Coll[Byte]].get
