@@ -83,8 +83,8 @@ techniques), allowing to off-load transaction from the main chain to sidechains.
 
 \subsection{Ergo blockchain details}
 
-We provide relevant Ergo blockchain needed here. Prior knowledge of UTXO accounting model, Bitcoin, data structures etc
-is needed.
+We provide relevant Ergo blockchain related information relevant to our constructions here. Prior knowledge of UTXO
+accounting model, Bitcoin~\cite{nakamoto2009}, data structures~(and many other topics involved in cryptocurrency design) is needed.
 \begin{itemize}
 \item{} Ergo has UTXO set commitments, so set of unspent outputs after processing transactions in a block is committed via
 authenticated AVL+ tree, with tree digest included into a block header.
@@ -98,7 +98,7 @@ In this section we consider how sidechain data can be stored on the main-chain.
 A sidechain progress can be represented in the simplest form as a tuple $(h, T_h, U_h, C_h)$, where
 $h$ is a sidechain height, $T_h$ are state changes (transactions) done in $h$, $U_h$ is digest of AVL+ tree built on top
 of UTXO set after processing the changes $T_h$, $C_h$ is AVL+ tree which contains all the previous sidechain states in form
-of key-value pairs $h -> hash(h || T_h || U_{h-1})$.
+of key-value pairs $h -> hash(h || T_h || U_h || C_{h-1})$.
 
 First of all, we need to write this minimal data somewhere, to read in contracts later. Currently, we can think about two options:
 
