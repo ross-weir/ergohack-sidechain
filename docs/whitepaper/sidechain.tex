@@ -112,7 +112,7 @@ block header (and can be read by a contract). We can include different sidechain
 
 There could be different option how sidechain can make a progress
 \begin{itemize}
-\item{} merged mining - PoW fields (nonce, solution) to be added to the tuple, and writted on the Ergo blockchain. Then sidechain header would be Ergo block header + extension Merkle path or path to box in UTXO set tree + sidechain tuple with PoW data. Security: subset of Ergo miners (so honest majority amongst them)
+\item{} merged mining - PoW fields (nonce, solution) to be added to the tuple, and written on the Ergo blockchain. Then sidechain header would be Ergo block header + extension Merkle path or path to box in UTXO set tree + sidechain tuple with PoW data. Security: subset of Ergo miners (so honest majority amongst them)
 
 \item{} if sidechain data is in a box, we can make the box spendable for an Ergo block miner (by using miner pubkey from context like done in emission contract). Security: subset of Ergo miners (so honest majority amongst them). There could be other options here (multisig etc)
 \end{itemize}
@@ -123,7 +123,7 @@ In this section we consider how to transfer ERG from main chain to sidechain, to
 how to transfer sERGs back, getting ERG on the main chain back.
 
 We assume setting where mainchain data is known to sidechain miners (validators) and so can be used in contracts. It seems
-this requirement can be relaxed further though.
+this requirement can be relaxed further though (by using SPV relay hard-coded or done via a contract).
 
 There are some assumptions we have for simplifying contracts:
 \begin{itemize}
