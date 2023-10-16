@@ -93,20 +93,18 @@ authenticated AVL+ tree, with tree digest included into a block header.
 
 \section{Sidechain Data on the Mainnet}
 
-In this section we consider how sidechain data can be stored on the main-chain.
-
-A sidechain progress can be represented in the simplest form as a tuple $(h, T_h, U_h, C_h)$, where
+In this section we consider how sidechain data can be stored on the main-chain. A sidechain progress can be represented in the simplest form as a tuple $(h, T_h, U_h, C_{h})$, where
 $h$ is a sidechain height, $T_h$ are state changes (transactions) done in $h$, $U_h$ is digest of AVL+ tree built on top
-of UTXO set after processing the changes $T_h$, $C_h$ is AVL+ tree which contains all the previous sidechain states in form
-of key-value pairs $h -> hash(h || T_h || U_h || C_{h-1})$.
+of UTXO set after processing the changes $T_h$, $C_{h}$ is AVL+ tree which contains all the previous sidechain states in form
+of key-value pairs $h \rightarrow hash(h || T_h || U_h || C_{h-1})$.
 
 First of all, we need to write this minimal data somewhere, to read in contracts later. Currently, we can think about two options:
 
 \begin{itemize}
-\item{} there's extension section of a block, which contains key -> value pairs, and root of a Merkle tree built upon the pairs is included into a
+\item{} there's extension section of a block, which contains key $\rightarrow$ value pairs, and root of a Merkle tree built upon the pairs is included into a
 block header (and can be read by a contract). We can include different sidechains here, or even a tree built on top of sidechains. The only issue with this approach is that Merkle trees are not supported in ErgoTree/Script yet
 
-\item{} we can just put sidechain data into a box identified by some NFT
+\item{} we can just put sidechain data into a box identified by some NFT. Then data can be read via read-only input.
 \end{itemize}
 
 \subsection{Sidechain Consensus}
