@@ -128,7 +128,7 @@ this requirement can be relaxed further though (by using SPV relay hard-coded or
 There are some assumptions we have for simplifying contracts:
 \begin{itemize}
   \item sidechain has no storage rent
-  \item sidechain consensus rules require that during input script validatin, for context variable \# 125 only mainchain;
+  \item sidechain consensus rules require that during input script validation, for context variable \# 125 only mainchain;
         state digest can be provided
 \end{itemize}
 
@@ -153,6 +153,15 @@ As transfers are based on contracts, sidechaining security is reduced to consens
 \knote{Fill with tests data}
 
 \section{Further Work}
+
+In this section we sketch possible extensions for proposed sidechain construction.
+
+\paragraph{Trustless Crosschain Transfers via Sidechains}
+
+It is possible to use Ergo sidechains for exchanges with other cryptocurrencies. We consider Bitcoin as an
+example. Sidechain in this case will have SPV relay support for Bitcoin, and also support for Bitcoin Merkle trees and
+transactions parsing. Then it is possible to unlock sBitcoins on sidechain on presenting proof-of-lock on Bitcoin
+sidechain. Still, no options for two-peg sidechains with Bitcoin blockchain known yet.
 
 \newpage
 \bibliography{sources}
