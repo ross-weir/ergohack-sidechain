@@ -92,6 +92,7 @@ authenticated AVL+ tree, with tree digest included into a block header.
 \end{itemize}
 
 \section{Sidechain Data on the Mainnet}
+\label{side-data}
 
 In this section we consider how sidechain data can be stored on the main-chain. A sidechain progress can be represented in the simplest form as a tuple $(h, T_h, U_h, C_{h})$, where
 $h$ is a sidechain height, $T_h$ are state changes (transactions) done in $h$, $U_h$ is digest of AVL+ tree built on top
@@ -108,11 +109,11 @@ block header (and can be read by a contract). We can include different sidechain
 \end{itemize}
 
 \subsection{Sidechain Consensus}
-
+\label{side-consensus}
 
 There could be different option how sidechain can make a progress
 \begin{itemize}
-\item{} merged mining - PoW fields (nonce, solution) to be added to the tuple, and written on the Ergo blockchain. Then sidechain header would be Ergo block header + extension Merkle path or path to box in UTXO set tree + sidechain tuple with PoW data. Security: subset of Ergo miners (so honest majority amongst them)
+\item{} merged mining - PoW fields (nonce, solution) to be added to the sidechain data tuple defined in Section~\ref{side-data}, and written on the Ergo blockchain. Then sidechain header would be Ergo block header + extension Merkle path or path to box in UTXO set tree + sidechain tuple with PoW data. Security: subset of Ergo miners (so honest majority amongst them)
 
 \item{} if sidechain data is in a box, we can make the box spendable for an Ergo block miner (by using miner pubkey from context like done in emission contract). Security: subset of Ergo miners (so honest majority amongst them). There could be other options here (multisig etc)
 \end{itemize}
@@ -146,7 +147,11 @@ Then contracts-powered transfers from main-chain to side-chain and back are done
 
 \section{Security}
 
-As transfers are based on contracts, sidechaining security is reduced to consensus.  \knote{to be continued}
+As transfers are based on contracts, sidechaining security is reduced to consensus. We consider options from Section
+
+In case of merged mining, so PoW puzzle written to the sidechain data, sidechain will be mined by subset of Ergo 
+main-chain miners, then consensus security is about honest majority of a subset of Ergo miners. 
+
 
 \section{Evaluation}
 
