@@ -147,11 +147,14 @@ Then contracts-powered transfers from main-chain to side-chain and back are done
 
 \section{Security}
 
-As transfers are based on contracts, sidechaining security is reduced to consensus. We consider options from Section
+As transfers are based on contracts, sidechaining security is reduced to consensus. We consider options
+from Section~\ref{side-consensus} here.
 
 In case of merged mining, so PoW puzzle written to the sidechain data, sidechain will be mined by subset of Ergo 
 main-chain miners, then consensus security is about honest majority of a subset of Ergo miners. 
 
+Similarly, if every block every miner~(and only miner) can publish sidechain data, consensus security is
+trivially also about honest majority of a subset of Ergo miners.
 
 \section{Evaluation}
 
