@@ -1,4 +1,7 @@
 {
+    // Contract attached to a box which contains a digest of a tree containing previous unlocks, to prevent
+    // double unlocks
+
     // tokens:
     //   #0 - contract NFT
     val selfTree = SELF.R4[AvlTree].get
@@ -13,10 +16,10 @@
     val expectedTree = selfTree.insert(insertOps, proof).get
 
     val validTransition =
-        SELF.value == selfOutput.value &&
-        SELF.tokens == selfOutput.tokens &&
-        SELF.propositionBytes == selfOutput.propositionBytes &&
-        expectedTree == selfOutput.R4[AvlTree].get
+        selfOutput.value == SELF.value &&
+        selfOutput.tokens == SELF.tokens &&
+        selfOutput.propositionBytes == SELF.propositionBytes &&
+        selfOutput.R4[AvlTree].get = expectedTree
 
     sigmaProp(validTransition)
 }
