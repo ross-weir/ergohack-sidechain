@@ -6,7 +6,7 @@
 
    val doubleUnlockPreventionContractNFT = fromBase64("") // todo: inject
 
-   val sideChainState: Box = CONTEXT.dataInputs(0)
+   val sideChainState: Box = CONTEXT.dataInputs(0) // todo: check validity
 
    val unlockStartHash = SELF.R4[Coll[Byte]]
 
