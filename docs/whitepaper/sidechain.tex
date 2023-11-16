@@ -67,6 +67,9 @@ back at a fixed or otherwise deterministic exchange rate\". Pegged sidechains en
 and other Ergo blockchain assets to be transferred between multiple Ergo-like blockchains. Sidechains can be considered as playgrounds for experimental features~(for example, a sidechain may support shielded transactions or other privacy-preserving
 techniques), or scalability solution, allowing to off-load transaction from the main chain to sidechains.
 
+In this work we consider what should a sidechain support and what data about sidechain is needed on the Ergo blockchain in
+order to have trustless~(smart contracts powered) two-way peg, with providing prototype contracts for peg-related transfers.
+
 \subsection{Ergo blockchain details}
 
 We provide relevant Ergo blockchain related information relevant to our constructions here. Prior knowledge of UTXO
@@ -156,6 +159,11 @@ It is possible to use Ergo sidechains for exchanges with other cryptocurrencies.
 example. Sidechain in this case will have SPV relay support for Bitcoin, and also support for Bitcoin Merkle trees and
 transactions parsing. Then it is possible to unlock sBitcoins on sidechain on presenting proof-of-lock on Bitcoin
 sidechain. Still, no options for two-peg sidechains with Bitcoin blockchain known yet.
+
+\paragraph{Sidechain Evolution at Superblock Speed}
+
+It seems to be doable to have a merged-mined sidechain, for example, which progress is done at faster pace
+than main-chain blocks. For that, it is needed to tie sidechain data updates with subblocks.
 
 \newpage
 \bibliography{sources}
