@@ -13,6 +13,9 @@
   //  R7: (Coll[Byte])  chainDigest  - AVL tree where leaf has height as key and hash of corresponding states hash(h, T_h, U_h, chainDigest_{h-1}) as value.
   //  R8: (Int) - height of the main-chain when side-chain was updated last time
 
+  // TODO: add receipt tokens, on each transition there will be additional output with current sidechain data and
+  // TODO: one receipt token, then receipts can be used in unlock contract instead of this box (which is being updated every block)
+
   val successor = OUTPUTS(0)
 
   val validImmFields =
