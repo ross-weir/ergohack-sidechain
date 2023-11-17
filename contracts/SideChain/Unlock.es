@@ -6,9 +6,7 @@
 
   val doubleUnlockPreventionContractNFT = fromBase64("") // todo: inject
 
-  val mainChainStateVarId = 125
-
-  val mainchainUtxoState = getVar[AvlTree](mainChainStateVarId).get
+  val mainchainUtxoState = getVar[AvlTree](125).get
 
   val mainchainBox = getVar[Box](0).get
   val mainchainUtxoProof = getVar[Coll[Byte]](1).get

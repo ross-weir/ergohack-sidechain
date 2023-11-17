@@ -19,7 +19,7 @@
         selfOutput.value == SELF.value &&
         selfOutput.tokens == SELF.tokens &&
         selfOutput.propositionBytes == SELF.propositionBytes &&
-        selfOutput.R4[AvlTree].get = expectedTree
+        selfOutput.R4[AvlTree].get == expectedTree
 
     sigmaProp(validTransition)
 }

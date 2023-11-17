@@ -1,5 +1,8 @@
 {
-   // MainChain contract
+   // MainChain unlock contract.
+   // ERGs are locked on main chain when locked in a box protected by this contract. The contract allows for
+   // unlocking ERGs
+
    // registers:
    // R4 - sidechain's last data id (hash) during unlock start
    // R5 - approx mainchain HEIGHT at unlock moment
@@ -35,8 +38,12 @@
    } else {
      // starting unlock
 
-     val sideChainStateHash = blake2b256(longToByteArray(sideChainState.R4[Long].get) ++
-        sideChainState.R5[Coll[Byte]].get ++ sideChainState.R6[Coll[Byte]].get ++ sideChainState.R7[Coll[Byte]].get)
+     val sideChainStateHash = blake2b256 (
+        longToByteArray(sideChainState.R4[Long].get) ++
+        sideChainState.R5[Coll[Byte]].get ++
+        sideChainState.R6[Coll[Byte]].get ++
+        sideChainState.R7[Coll[Byte]].get
+     )
 
      val selfOutput = OUTPUTS(0)
      val outHeight = selfOutput.R5[Int].get
