@@ -14,27 +14,38 @@ object Constants {
 
   def getAddressFromErgoTree(ergoTree: ErgoTree): ErgoAddress = ergoAddressEncoder.fromProposition(ergoTree).get
 
+  // totally inefficient substitution method, but ok for our contracts
+  def substitute(contract: String, substitutionMap: Map[String, String]): String = {
+    substitutionMap.foldLeft(contract) { case (c, (k, v)) =>
+      c.replace("$" + k, v)
+    }
+  }
+
+  def readContract(path: String, substitutionMap: Map[String, String] = Map.empty): String = {
+    substitute(scala.io.Source.fromFile("contracts/" + path, "utf-8").getLines.mkString("\n"), substitutionMap)
+  }
+
   def compile(ergoScript: String): ErgoTree = {
     AppkitHelpers.compile(new util.HashMap[String, Object](), ergoScript, networkPrefix)
   }
 
-  val sidechainStateContract = scala.io.Source.fromFile("contracts/MainChain/SideChainState.es", "utf-8").getLines.mkString("\n")
+  val sidechainStateContract = readContract("MainChain/SideChainState.es")
   val sidechainStateErgoTree = compile(sidechainStateContract)
   val sidechainStateAddress = getAddressFromErgoTree(sidechainStateErgoTree)
 
-  val doubleUnlockPreventionContract = scala.io.Source.fromFile("contracts/DoubleUnlockPrevention.es", "utf-8").getLines.mkString("\n")
+  val doubleUnlockPreventionContract = readContract("DoubleUnlockPrevention.es")
   val doubleUnlockPreventionErgoTree = compile(doubleUnlockPreventionContract)
   val doubleUnlockPreventionAddress = getAddressFromErgoTree(doubleUnlockPreventionErgoTree)
 
-  val transferUnlockContract = scala.io.Source.fromFile("contracts/MainChain/Unlock.es", "utf-8").getLines.mkString("\n")
+  val transferUnlockContract = readContract("MainChain/Unlock.es")
   val transferUnlockErgoTree = compile(transferUnlockContract)
   val transferUnlockAddress = getAddressFromErgoTree(transferUnlockErgoTree)
 
-  val sidechainUnlockContract = scala.io.Source.fromFile("contracts/SideChain/Unlock.es", "utf-8").getLines.mkString("\n")
+  val sidechainUnlockContract = readContract("SideChain/Unlock.es")
   val sidechainUnlockErgoTree = compile(sidechainUnlockContract)
   val sidechainUnlockAddress = getAddressFromErgoTree(sidechainUnlockErgoTree)
 
-  val sidechainUnlockCompleteContract = scala.io.Source.fromFile("contracts/SideChain/UnlockComplete.es", "utf-8").getLines.mkString("\n")
+  val sidechainUnlockCompleteContract = readContract("SideChain/UnlockComplete.es")
   val sidechainUnlockCompleteErgoTree = compile(sidechainUnlockCompleteContract)
   val sidechainUnlockCompleteAddress = getAddressFromErgoTree(sidechainUnlockCompleteErgoTree)
 

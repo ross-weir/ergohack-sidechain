@@ -14,7 +14,7 @@
    val unlockStartHash = SELF.R4[Coll[Byte]]
 
    //todo: add refund path
-   if(unlockStartHash.isDefined) {
+   if (unlockStartHash.isDefined) {
      val sidechainConfs = 50
 
      val committedHeight = getVar[Long](0).get
