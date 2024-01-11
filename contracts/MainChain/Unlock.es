@@ -28,7 +28,7 @@
      val proof = getVar[Coll[Byte]](4).get
      val chainTree = getVar[AvlTree](5).get
 
-     val properTree = chainTree.digest.slice(0,32) == sideChainState.R7[Coll[Byte]].get
+     val properTree = chainTree.digest.slice(0,32) == sideChainState.R7[Coll[Byte]].get // todo: or slice(1,33) ?
 
      val treeContainsCommittedHash = chainTree.get(committedHeightBytes, proof).get == chHash
 
