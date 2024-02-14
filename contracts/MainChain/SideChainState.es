@@ -8,7 +8,7 @@
   //
   // REGISTERS
   //  R4: (Long)         h       - Height of the sidechain.
-  //  R5: (Coll[Byte])  T_h     - State changes (transactions) done at h.
+  //  R5: (Coll[Byte])  T_h     - Digest of state changes (transactions) done at h.
   //  R6: (Coll[Byte])  U_h     - UTXO set digest after processing changes.
   //  R7: (Coll[Byte])  chainDigest  - AVL tree where leaf has height as key and hash of corresponding states hash(h, T_h, U_h, chainDigest_{h-1}) as value.
   //  R8: (Int) - height of the main-chain when side-chain was updated last time
