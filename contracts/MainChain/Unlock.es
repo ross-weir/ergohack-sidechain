@@ -39,6 +39,8 @@
 
      // TODO: add signature ? then only one who sent ERG to the sidechain can claim them back, but at the
      // TODO: same time miners can't steal ERG collectively
+     // TODO: it is possible to have both options, and UI can propose user to choose between secured/unsecured options
+     // TODO: possible to have federated custody via multisig etc
 
      sigmaProp(mainchainHeightMet && properTree && treeContainsCommittedHash && enoughSidechainConfs)
    } else {

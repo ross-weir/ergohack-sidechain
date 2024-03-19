@@ -41,11 +41,19 @@
   //
   // For non merged mining setting, we still can use mainchain miners to submit sidechain data, a question then is
   // why miners should report sidechain data. They can be incentivized via something like BIP-301
-  // (https://en.bitcoin.it/wiki/BIP_0301 ). See BIP-300 & BIP-301 critic by Peter Todd and not only.
+  // (https://en.bitcoin.it/wiki/BIP_0301 ). See BIP-300 & BIP-301 criticism by Peter Todd and not only.
   // Another option is about building relays for other chains (and then abandon this contract or rework it into a
   // small proxy contract). For sha256 based chains PoW verification can be trivial, for complex PoW algorithms (
   // EthHash, EagleSong, kHeavyHash etc) optimistic (such as FairSwap) or Zero-Knowledge (such as BulletProofs or Halo2)
   // verifiable computing techniques.
+  //
+  // idea: we can still have miners posting sidechain data and receiving rewards from a contract on sidechain, which
+  //       is much more clear option that BIP-301. For that, we need to add autolykos validation operation to the
+  //       sidechain (and nbits conversion), and do a relay contract using it. With the relay it is possible to deliver
+  //       mainchain data on the sidechain without trust to sidechain miners. Then we can have emission contract on the
+  //       sidechain which is (using relay) paying to maichain miners for posting correct sidechain data on the
+  //       mainchain. Thus part of sidechain emission is going to mainchain miners. Sidechain could be on PoS or other
+  //       non-PoW consensus even.
 
   val minerProof = proveDlog(CONTEXT.preHeader.minerPk)
 

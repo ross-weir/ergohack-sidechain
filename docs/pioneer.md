@@ -34,7 +34,7 @@ Pre-built applications
 ----------------------
 
 * **Spectrum DEX**
-* **Rosen bridge** - Ergo deployment can be used to transfer from the Pioneer to non-Ergo chains
+* **Rosen bridge** - Ergo deployment can be used to transfer from the Pioneer 
 * **Sidechaining (with UI or just scripts for hackers?)**
 * **HodlPIO** - (instead of vesting) ? 
 
@@ -55,7 +55,10 @@ Tech plan
 
 
 
-
 Sidechaining Security
 ---------------------
 
+
+
+Resources needed
+----------------
