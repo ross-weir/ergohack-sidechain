@@ -15,6 +15,8 @@
 
    //todo: add refund path
    if (unlockStartHash.isDefined) {
+     // completing unlock
+
      val sidechainConfs = 50
 
      val committedHeight = getVar[Long](0).get
@@ -34,6 +36,10 @@
 
      val mainchainHeightMet = SELF.R5[Int].get > HEIGHT
      val enoughSidechainConfs = (sideChainState.R4[Long].get - committedHeight) > sidechainConfs
+
+     // TODO: add signature ? then only one who sent ERG to the sidechain can claim them back, but at the
+     // TODO: same time miners can't steal ERG collectively
+
      sigmaProp(mainchainHeightMet && properTree && treeContainsCommittedHash && enoughSidechainConfs)
    } else {
      // starting unlock
