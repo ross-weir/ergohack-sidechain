@@ -58,6 +58,39 @@ Tech plan
 Sidechaining Security
 ---------------------
 
+When sidechaining data is delivered, sidechaining security is reduced to security to another chain, or can be stronger
+if we require for sender's signature on unlock.
+ 
+Then we need to consider mechanisms for delivering sidechaining data for both directions
+
+* ERG data on PIO: 
+
+There is no need to support Ergo blockchain in PIO consensus, what is needed, is to leave existing data types 
+and types, including Ergo header with functions to check PoW. Then it is possible to do a trustless relay contract for 
+Ergo blockchain which is verifying and then accepting a best header with valid PoW, storing a commitment to Ergo block headers 
+history (as a digest of AVL+ tree), as well as current state of the Ergo blockchain, including UTXO set commitment. Then
+this state can be used in sidechaining contracts.
+
+
+* PIO data on ERG: 
+
+As Ethash PoW check is not supported, building trustless relay contract is not so trivial in order to deliver PIO data 
+on ERG.
+
+We can consider then that sidechaining data can be updated by Ergo miners , like in merged-mined case from the 
+sidechains whitepaper (todo: ref), but as this is not merged-mined case, why should Ergo miners do that? 
+
+As a possible option, we can reward Ergo miners on PIO for providing PIO data on the Ergo blockchain. For that, assuming
+that trustless ERG->PIO relay exists, we create an emission contract which is releasing a reward to Ergo miner 
+providing a proof of PIO data updating by himself on the Ergo blockchain. This is a bit similar to BIP-301, but with 
+better security due to constant rewards mechanism.
+
+Please note that there is no need for Ergo miner to verify PIO blockchain fully, it is likely enough to be just an SPV
+client of the PIO network.
+
+Another option is to do Ethash verification via Bulletproofs or FastSwap like techiques, left for further research. 
+
+
 
 
 Resources needed
