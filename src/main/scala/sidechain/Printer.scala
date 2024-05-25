@@ -49,10 +49,17 @@ object Constants {
   val sidechainUnlockCompleteErgoTree = compile(sidechainUnlockCompleteContract)
   val sidechainUnlockCompleteAddress = getAddressFromErgoTree(sidechainUnlockCompleteErgoTree)
 
+  // relay contracts
+  val btcRelayContract = readContract("relay/BtcRelay.es")
+  val btcRelayErgoTree = compile(btcRelayContract)
+  val btcRelayAddress = getAddressFromErgoTree(btcRelayErgoTree)
+
 }
 
 object Printer extends App {
   import Constants._
+
+  println(s"Btc relay contract address: $btcRelayAddress")
 
   println(s"Sidechain state contract address: ${sidechainStateAddress}")
   println(s"Double unlock prevention contract address: ${doubleUnlockPreventionAddress}")
