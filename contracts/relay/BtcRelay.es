@@ -23,11 +23,15 @@
     val nBitsBytes = reverse4(headerBytes.slice(72, 76))
     val nonceBytes = reverse4(headerBytes.slice(76, 80))
 
-    // todo: check PoW, check PoW change
+    // todo: PoW check done in https://github.com/ScorexFoundation/sigmastate-interpreter/pull/962/files#diff-0c90193c56b117e79102c148a0ea2bb74eecd8cc50ca7629795259757efdf284R170
+    // todo: it relies on 6.0 decodeNbits() method, thus we skip it here
+    val validPow = true
 
+    // todo: check PoW change
     val validParent = prevBlockHashBytes == tipHash
 
     // todo: check tipHash and tipHeight update
+    // todo: forking
 
     sigmaProp(validParent)
 }
