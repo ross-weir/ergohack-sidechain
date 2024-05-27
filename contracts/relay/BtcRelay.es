@@ -1,7 +1,13 @@
 {
-    val headersDigest = SELF.R4[AvlTree].get
-    val tipHeight = SELF.R5[Int].get
-    val tipHash = SELF.R6[Coll[Byte]].get
+    // header bytes in context var #1
+
+    val bestChainDigest = SELF.R4[AvlTree].get
+    val allHeadersDigest = SELF.R5[AvlTree].get
+
+    val tipHeight = SELF.R6[Int].get
+    val tipHash = SELF.R7[Coll[Byte]].get
+
+    val selfOut = OUTPUTS(0)
 
     // todo: implement reverse for 6.0
 
@@ -25,8 +31,10 @@
 
     val pad = Coll[Byte](0.toByte, 0.toByte, 0.toByte, 0.toByte)
 
+    // block (header) id
+    val id = reverse32(sha256(sha256(headerBytes)))
+
     val validPow = {
-        val id = reverse32(sha256(sha256(headerBytes)))
         val hit = byteArrayToBigInt(id)
         val nbits = byteArrayToLong(pad ++ nBitsBytes)
         val difficulty = Global.decodeNbits(nbits) // 6.0 method
@@ -35,11 +43,32 @@
         hit <= difficulty
     }
 
-    // todo: check PoW change
-    val validParent = prevBlockHashBytes == tipHash
+    // todo: check diff change every 2016 blocks
 
-    // todo: check tipHash and tipHeight update
     // todo: forking
 
-    sigmaProp(validParent)
+    val validTipUpdate = if(prevBlockHashBytes == tipHash) {
+        val keyVal = (id, headerBytes)
+
+        val proof = getVar[Coll[Byte]](2).get
+
+        val nextTree: Option[AvlTree] = bestChainDigest.insert(Coll(keyVal), proof)
+         // This will fail if the operation failed or the proof is incorrect due to calling .get on the Option
+        val outputDigest: Coll[Byte] = nextTree.get.digest
+
+        val outBestChainTree = selfOut.R4[AvlTree].get
+
+        outBestChainTree.digest == outputDigest &&
+        outBestChainTree.enabledOperations == bestChainDigest.enabledOperations &&
+        selfOut.R6[Int].get == tipHeight + 1 &&
+        selfOut.R7[Coll[Byte]].get == id
+    } else {
+        true
+    }
+
+    val allHeadersDbUpdate = {
+        true
+    }
+
+    sigmaProp(validPow && validTipUpdate && allHeadersDbUpdate)
 }
