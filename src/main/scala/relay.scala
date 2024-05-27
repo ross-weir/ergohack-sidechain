@@ -74,4 +74,6 @@ object relay extends App {
 
   println(Base16.encode(prevBlockHashBytes.reverse))
 
+  println((new BigInteger("2")).pow(255))
+
 }

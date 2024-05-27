@@ -1,11 +1,15 @@
 {
     // header bytes in context var #1
 
+    // id -> header
     val bestChainDigest = SELF.R4[AvlTree].get
+
+    // id -> (header, chain digest, cumulative work)
     val allHeadersDigest = SELF.R5[AvlTree].get
 
     val tipHeight = SELF.R6[Int].get
     val tipHash = SELF.R7[Coll[Byte]].get
+    val tipWork = SELF.R8[BigInt].get
 
     val selfOut = OUTPUTS(0)
 
@@ -29,18 +33,19 @@
     val nBitsBytes = reverse4(headerBytes.slice(72, 76))
     val nonceBytes = reverse4(headerBytes.slice(76, 80))
 
+    // calculate target to validate PoW & calculate work
     val pad = Coll[Byte](0.toByte, 0.toByte, 0.toByte, 0.toByte)
+    val nbits = byteArrayToLong(pad ++ nBitsBytes)
+    val target = Global.decodeNbits(nbits) // 6.0 method
 
     // block (header) id
     val id = reverse32(sha256(sha256(headerBytes)))
 
     val validPow = {
         val hit = byteArrayToBigInt(id)
-        val nbits = byteArrayToLong(pad ++ nBitsBytes)
-        val difficulty = Global.decodeNbits(nbits) // 6.0 method
 
         // <= according to https://bitcoin.stackexchange.com/a/105224
-        hit <= difficulty
+        hit <= target
     }
 
     // todo: check diff change every 2016 blocks
@@ -67,7 +72,19 @@
     }
 
     val allHeadersDbUpdate = {
-        true
+        // 2^255 as signed big int is used
+        val maxTarget = bigInt("57896044618658097711785492504343953926634992332820282019728792003956564819968")
+        val work = maxTarget / ((target + 1) / 2)
+
+        val parentData = getVar[Coll[Byte]](2).get
+        val parentCumWork = byteArrayToBigInt(parentData.slice(0, 0)) // todo: bytes
+        val cumWork = parentCumWork + work
+
+        if (cumWork > tipWork) {
+            true // todo: implement
+        } else {
+            true // todo: implement
+        }
     }
 
     sigmaProp(validPow && validTipUpdate && allHeadersDbUpdate)
