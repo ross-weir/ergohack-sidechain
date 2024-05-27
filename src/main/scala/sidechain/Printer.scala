@@ -1,14 +1,18 @@
 package sidechain
 
+import org.ergoplatform.sdk.NetworkType
 import org.ergoplatform.{ErgoAddress, ErgoAddressEncoder}
-import org.ergoplatform.appkit.{AppkitHelpers, NetworkType}
-import sigmastate.Values.ErgoTree
+import sigma.VersionContext
+import sigma.ast.ErgoTree
+import sigma.ast.syntax.ValueOps
+import sigmastate.eval.CompiletimeIRContext
+import sigmastate.interpreter.Interpreter.ScriptEnv
+import sigmastate.lang.SigmaCompiler
 
-import java.util
 
 object Constants {
 
-  val networkType = NetworkType.MAINNET
+  val networkType = NetworkType.Mainnet
   val networkPrefix = networkType.networkPrefix
   val ergoAddressEncoder = new ErgoAddressEncoder(networkPrefix)
 
@@ -26,8 +30,12 @@ object Constants {
   }
 
   def compile(ergoScript: String): ErgoTree = {
-    AppkitHelpers.compile(new util.HashMap[String, Object](), ergoScript, networkPrefix)
-  }
+    val compiler = SigmaCompiler(networkPrefix)
+    val env: ScriptEnv = Map.empty
+    implicit val IR = new CompiletimeIRContext
+    val res = compiler.compile(env, ergoScript)
+    ErgoTree.fromProposition(res.buildTree.asSigmaProp)
+ }
 
   val sidechainStateContract = readContract("MainChain/SideChainState.es")
   val sidechainStateErgoTree = compile(sidechainStateContract)
@@ -49,10 +57,12 @@ object Constants {
   val sidechainUnlockCompleteErgoTree = compile(sidechainUnlockCompleteContract)
   val sidechainUnlockCompleteAddress = getAddressFromErgoTree(sidechainUnlockCompleteErgoTree)
 
-  // relay contracts
-  val btcRelayContract = readContract("relay/BtcRelay.es")
-  val btcRelayErgoTree = compile(btcRelayContract)
-  val btcRelayAddress = getAddressFromErgoTree(btcRelayErgoTree)
+  val btcRelayAddress = VersionContext.withVersions(VersionContext.V6SoftForkVersion, 0) {
+    // relay contracts
+    val btcRelayContract = readContract("relay/BtcRelay.es")
+    val btcRelayErgoTree = compile(btcRelayContract)
+    getAddressFromErgoTree(btcRelayErgoTree)
+  }
 
 }
 

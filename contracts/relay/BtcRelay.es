@@ -23,9 +23,17 @@
     val nBitsBytes = reverse4(headerBytes.slice(72, 76))
     val nonceBytes = reverse4(headerBytes.slice(76, 80))
 
-    // todo: PoW check done in https://github.com/ScorexFoundation/sigmastate-interpreter/pull/962/files#diff-0c90193c56b117e79102c148a0ea2bb74eecd8cc50ca7629795259757efdf284R170
-    // todo: it relies on 6.0 decodeNbits() method, thus we skip it here
-    val validPow = true
+    val pad = Coll[Byte](0.toByte, 0.toByte, 0.toByte, 0.toByte)
+
+    val validPow = {
+        val id = reverse32(sha256(sha256(headerBytes)))
+        val hit = byteArrayToBigInt(id)
+        val nbits = byteArrayToLong(pad ++ nBitsBytes)
+        val difficulty = Global.decodeNbits(nbits) // 6.0 method
+
+        // <= according to https://bitcoin.stackexchange.com/a/105224
+        hit <= difficulty
+    }
 
     // todo: check PoW change
     val validParent = prevBlockHashBytes == tipHash
