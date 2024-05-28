@@ -123,8 +123,16 @@
 
         if (cumWork > tipWork && prevBlockId != tipHash) { // todo: condition is wrong
             // switch to better chain
+        //    selfOut.R6[Int].get == tipHeight + 1 &&
+         //   selfOut.R7[Coll[Byte]].get == id
 
-            allHeadersUpdateOk
+            val outBestChainTree = selfOut.R4[AvlTree].get
+
+            val switchOk = outBestChainTree.digest == updDigest &&
+                            outBestChainTree.enabledOperations == bestChainDigest.enabledOperations &&
+                            selfOut.R7[Coll[Byte]].get == id
+
+            allHeadersUpdateOk && switchOk
         } else {
             // add header along with metadata to all-headers tree
             allHeadersUpdateOk
