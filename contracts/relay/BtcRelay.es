@@ -12,6 +12,8 @@
     // #3 - parent header lookup proof for all headers db
     // #4 - parent header's chain digest
 
+    // todo: add NFT id and check it
+
     // id -> header (80 bytes) + height (8 bytes)
     val bestChainDigest = SELF.R4[AvlTree].get
 
