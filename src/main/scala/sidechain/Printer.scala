@@ -74,7 +74,7 @@ object Printer extends App {
   import Constants._
 
   println(s"Btc relay contract address: $btcRelayAddress")
-  println(s"Btc tx check contract address: $btcRelayAddress")
+  println(s"Btc tx check contract address: $btcTxCheckAddress")
 
   println(s"Sidechain state contract address: ${sidechainStateAddress}")
   println(s"Double unlock prevention contract address: ${doubleUnlockPreventionAddress}")
