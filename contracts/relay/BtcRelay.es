@@ -1,4 +1,11 @@
 {
+    // registers:
+    // R4 - best headers-chain tree
+    // R5 - all headers tree
+    // R6 - tip height
+    // R7 - tip block id
+    // R8 - tip cumulative work
+    //
     // context vars:
     // #1 - new header bytes
     // #2 - best chain tree insert proof
@@ -8,7 +15,7 @@
     // id -> header (80 bytes) + height (8 bytes)
     val bestChainDigest = SELF.R4[AvlTree].get
 
-    // id -> header (80 bytes) + chain digest (33 bytes) + cumulative work
+    // id -> header (80 bytes) + height (8 bytes) + chain digest (33 bytes) + cumulative work
     // chain digest here is constructed in the same way as best header chain digest
     val allHeadersDigest = SELF.R5[AvlTree].get
 
@@ -57,9 +64,11 @@
         hit <= target
     }
 
-    // todo: check diff change every 2016 blocks
+    // 2^255 as signed big int is used
+    val maxTarget = bigInt("57896044618658097711785492504343953926634992332820282019728792003956564819968")
+    val work = maxTarget / ((target + 1) / 2)
 
-    // todo: forking
+    // todo: check diff change every 2016 blocks
 
     // best chain header record
     val headerRow = (id, headerBytes ++ longToByteArray(tipHeight.toLong))
@@ -74,10 +83,13 @@
 
         val outBestChainTree = selfOut.R4[AvlTree].get
 
+        val cumWork = tipWork + work
+
         outBestChainTree.digest == outputDigest &&
         outBestChainTree.enabledOperations == bestChainDigest.enabledOperations &&
         selfOut.R6[Int].get == tipHeight + 1 &&
-        selfOut.R7[Coll[Byte]].get == id
+        selfOut.R7[Coll[Byte]].get == id &&
+        selfOut.R8[BigInt].get == cumWork
     } else {
         true
     }
@@ -87,16 +99,12 @@
         val parentProof = getVar[Coll[Byte]](3).get
         val parentData = allHeadersDigest.get(prevBlockId, parentProof).get
 
-        // 2^255 as signed big int is used
-        val maxTarget = bigInt("57896044618658097711785492504343953926634992332820282019728792003956564819968")
-        val work = maxTarget / ((target + 1) / 2)
-
         // todo: should we store first 80 bytes (header)? they are not used
-        val parentChainDigest = parentData.slice(80, 113)
+        val parentChainDigest = parentData.slice(88, 121)
 
         // todo: with AVL tree constructing options in 6.0, this getVar can be eliminated
         val parentChainProvided = getVar[AvlTree](4).get
-        val parentCumWork = byteArrayToBigInt(parentData.slice(113, parentData.size))
+        val parentCumWork = byteArrayToBigInt(parentData.slice(121, parentData.size))
         val cumWork = parentCumWork + work
 
         val parentChainUpdateProof = getVar[Coll[Byte]](5).get
@@ -113,9 +121,9 @@
                                     cumWork == byteArrayToBigInt(cumWorkProvided) &&
                                     allHeadersDbUpdated == newAllHeadersDigestProvided
 
-        if (cumWork > tipWork) {
+        if (cumWork > tipWork && prevBlockId != tipHash) { // todo: condition is wrong
             // switch to better chain
-            // todo: implement
+
             allHeadersUpdateOk
         } else {
             // add header along with metadata to all-headers tree
