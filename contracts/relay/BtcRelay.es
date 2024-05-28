@@ -121,24 +121,23 @@
                                     cumWork == byteArrayToBigInt(cumWorkProvided) &&
                                     allHeadersDbUpdated == newAllHeadersDigestProvided
 
-        if (cumWork > tipWork && prevBlockId != tipHash) { // todo: condition is wrong
+        if (cumWork > tipWork && prevBlockId != tipHash) {
             // switch to better chain
-        //    selfOut.R6[Int].get == tipHeight + 1 &&
-         //   selfOut.R7[Coll[Byte]].get == id
 
             val outBestChainTree = selfOut.R4[AvlTree].get
+            val parentHeight = byteArrayToLong(parentData.slice(80, 88))
 
             val switchOk = outBestChainTree.digest == updDigest &&
                             outBestChainTree.enabledOperations == bestChainDigest.enabledOperations &&
-                            selfOut.R7[Coll[Byte]].get == id
+                            selfOut.R6[Int].get == parentHeight + 1 &&
+                            selfOut.R7[Coll[Byte]].get == id &&
+                            selfOut.R8[BigInt].get == cumWork
 
             allHeadersUpdateOk && switchOk
         } else {
             // add header along with metadata to all-headers tree
             allHeadersUpdateOk
         }
-
-
     }
 
     sigmaProp(validPow && validTipUpdate && allHeadersDbUpdate)
