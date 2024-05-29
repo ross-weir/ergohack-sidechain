@@ -32,11 +32,9 @@
 
     val headerProof = getVar[Coll[Byte]](3).get
 
-    val merkleProof = getVar[Coll[Coll[Byte]]](4).get
-
     val bestChain = relayDataInput.R4[AvlTree].get
 
-    val headerAndHeight = bestChain.get(headerId).get
+    val headerAndHeight = bestChain.get(headerId, headerProof).get
 
     val height = byteArrayToLong(headerAndHeight.slice(80, 88))
 
@@ -44,7 +42,22 @@
 
     val enoughConfs = (tipHeight - height) >= minConfs
 
-    val merkleRootBytes = reverse32(headerBytes.slice(36, 68))
+    val merkleRootBytes = reverse32(headerAndHeight.slice(36, 68))
 
-    sigmaProp(properRelay && enoughConfs)
+    val merkleProof = getVar[Coll[Coll[Byte]]](4).get
+
+    def computeLevel(prevHash: Coll[Byte], proofElem: Coll[Byte]) = {
+        val elemHash = proofElem.slice(1,33)
+        if(proofElem(0) == 0){
+          doubleSha256(prevHash ++ proofElem)
+        } else {
+          doubleSha256(proofElem ++ prevHash)
+        }
+    }
+
+    val computedMerkleRoot = merkleProof.fold(txId, computeLevel)
+
+    val properProof = computedMerkleRoot == merkleRootBytes
+
+    sigmaProp(properRelay && enoughConfs && properProof)
 }
