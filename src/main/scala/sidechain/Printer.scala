@@ -57,12 +57,13 @@ object Constants {
   val sidechainUnlockCompleteErgoTree = compile(sidechainUnlockCompleteContract)
   val sidechainUnlockCompleteAddress = getAddressFromErgoTree(sidechainUnlockCompleteErgoTree)
 
-  val btcRelayAddress = VersionContext.withVersions(VersionContext.V6SoftForkVersion, 0) {
-    // relay contracts
-    val btcRelayContract = readContract("relay/BtcRelay.es")
-    val btcRelayErgoTree = compile(btcRelayContract)
-    getAddressFromErgoTree(btcRelayErgoTree)
+  // relay contracts
+  val btcRelayContract = readContract("relay/BtcRelay.es")
+  val btcRelayErgoTree = VersionContext.withVersions(VersionContext.V6SoftForkVersion, 0) {
+    // 6.0 dependent
+    compile(btcRelayContract)
   }
+  val btcRelayAddress = getAddressFromErgoTree(btcRelayErgoTree)
 
   val btcTxCheckContract = readContract("relay/BtcTxCheck.es")
   val btcTxCheckErgoTree = compile(btcTxCheckContract)

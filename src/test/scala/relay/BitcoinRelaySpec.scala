@@ -1,0 +1,6 @@
+package relay
+
+
+class BitcoinRelaySpec {
+
+}
