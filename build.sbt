@@ -12,6 +12,7 @@ resolvers ++= Seq(
 
 libraryDependencies ++= Seq(
   "org.scorexfoundation" %% "sigma-state" % "5.0.14-60-a90e7bea-20240527-1732-SNAPSHOT",
-  "org.ergoplatform" %% "ergo-core" % "5.0.21-0-1a417f44-20240530-0003-SNAPSHOT",
+  "org.ergoplatform" %% "ergo-core" % "5.0.21-34-53c8ed09-SNAPSHOT",
+  "io.github.k-singh" %% "plasma-toolkit" % "1.0.4",
   "org.scalatest" %% "scalatest" % "3.2.18" % Test
 )

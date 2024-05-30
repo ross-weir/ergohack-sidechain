@@ -5,8 +5,13 @@
     // #3 - headerProof
     // #4 - Merkle proof
 
+    // registers:
+    // no registers used
+
     //hardcoded constant
-    val relayNftId = fromBase16("")
+
+    // todo: change before deployment
+    val relayNftId = fromBase16("0000000000000000000000000000000000000000000000000000000000000000")
     val minConfs = 6 // minimum 6 confirmations required
 
     val relayDataInput = CONTEXT.dataInputs(0)
@@ -15,17 +20,9 @@
 
     def doubleSha256(bytes: Coll[Byte]) = sha256(sha256(bytes))
 
-    def reverse32(bytes: Coll[Byte]): Coll[Byte] = {
-        Coll(bytes(31), bytes(30), bytes(29), bytes(28), bytes(27), bytes(26), bytes(25), bytes(24),
-             bytes(23), bytes(22), bytes(21), bytes(20), bytes(19), bytes(18), bytes(17), bytes(16),
-             bytes(15), bytes(14), bytes(13), bytes(12), bytes(11), bytes(10), bytes(9), bytes(8),
-             bytes(7), bytes(6), bytes(5), bytes(4), bytes(3), bytes(2), bytes(1), bytes(0))
-    }
-
     val txBytes = getVar[Coll[Byte]](1).get
     val txId = doubleSha256(txBytes)
 
-    // todo: check Merkle proof
     // todo: parse transaction
 
     val headerId = getVar[Coll[Byte]](2).get
@@ -42,22 +39,24 @@
 
     val enoughConfs = (tipHeight - height) >= minConfs
 
-    val merkleRootBytes = reverse32(headerAndHeight.slice(36, 68))
+    val merkleRootBytes = headerAndHeight.slice(36, 68)
 
     val merkleProof = getVar[Coll[Coll[Byte]]](4).get
 
     def computeLevel(prevHash: Coll[Byte], proofElem: Coll[Byte]) = {
         val elemHash = proofElem.slice(1,33)
         if(proofElem(0) == 0){
-          doubleSha256(prevHash ++ proofElem)
+          doubleSha256(elemHash ++ prevHash)
         } else {
-          doubleSha256(proofElem ++ prevHash)
+          doubleSha256(prevHash ++ elemHash)
         }
     }
 
     val computedMerkleRoot = merkleProof.fold(txId, computeLevel)
 
     val properProof = computedMerkleRoot == merkleRootBytes
+
+    // todo: add NFT and preservation checks ?
 
     sigmaProp(properRelay && enoughConfs && properProof)
 }

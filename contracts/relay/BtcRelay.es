@@ -44,7 +44,7 @@
 
     val headerBytes = getVar[Coll[Byte]](1).get
     val prevBlockId = reverse32(headerBytes.slice(4, 36))
-    val merkleRootBytes = reverse32(headerBytes.slice(36, 68))
+    // val merkleRootBytes = headerBytes.slice(36, 68)
     val timeBytes = reverse4(headerBytes.slice(68, 72))
     val nBitsBytes = reverse4(headerBytes.slice(72, 76))
     val nonceBytes = reverse4(headerBytes.slice(76, 80))

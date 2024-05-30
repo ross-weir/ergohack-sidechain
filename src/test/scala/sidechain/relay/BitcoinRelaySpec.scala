@@ -1,5 +1,4 @@
-package relay
-
+package sidechain.relay
 
 class BitcoinRelaySpec {
 

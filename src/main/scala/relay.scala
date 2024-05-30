@@ -44,8 +44,12 @@ object relay extends App {
 
   // height 566092
   val h2 = "00000020a82ff9c62e69a6cbed277b7f2a9ac9da3c7133a59a6305000000000000000000f6cd5708a6ba38d8501502b5b4e5b93627e8dcc9bd13991894c6e04ade262aa99582815c505b2e17479a751b"
-  val bytes = Base16.decode(h1).get
 
+
+  // 93500
+  val h3 = "01000000076379e2c0ec4a614ad1bf0ec716e6873f2c7abac604a08cc78e070000000000579a6bbcd07e9c3d622672ad20495d4485b5233395ab4081db7cab0fd2b577d2396cec4c2a8b091b031a7313"
+
+  val bytes = Base16.decode(h3).get
 
   val version = Ints.fromByteArray(bytes.take(4).reverse)
 
