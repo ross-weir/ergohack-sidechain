@@ -59,7 +59,7 @@ class BitcoinRelaySpec  extends AnyPropSpec with Matchers with TestHelpers {
     val allHeadersPlasmaMap = new PlasmaMap[Array[Byte], Array[Byte]](AvlTreeFlags.InsertOnly, PlasmaParameters.default)
     val h1Record = h1HeaderAndHeight ++ bestChainTree1.digest.toArray ++ h1CumWork.toByteArray
     allHeadersPlasmaMap.insert(h1Id -> h1Record)
-    val allHeadersTree1 = bestChainPlasmaMap.ergoValue.getValue
+    val allHeadersTree1 = allHeadersPlasmaMap.ergoValue.getValue
 
     val h1LookupRes = allHeadersPlasmaMap.lookUp(h1Id)
 
@@ -83,7 +83,7 @@ class BitcoinRelaySpec  extends AnyPropSpec with Matchers with TestHelpers {
     val bestChainTree2 = bestChainPlasmaMap.ergoValue.getValue
 
     val h2Record = h2HeaderAndHeight ++ bestChainTree2.digest.toArray ++ h2CumWork.toByteArray
-    val insertH2AllRes = allHeadersPlasmaMap.insert((h2Id -> h2Record))
+    val insertH2AllRes = allHeadersPlasmaMap.insert(h2Id -> h2Record)
     val allHeadersTree2 = allHeadersPlasmaMap.ergoValue.getValue
 
     val relayOutput = new ErgoBoxCandidate (
@@ -100,6 +100,119 @@ class BitcoinRelaySpec  extends AnyPropSpec with Matchers with TestHelpers {
       )
     )
 
+    // #1 - new header bytes
+    // #2 - best chain tree insert proof // if tip update
+    // #3 - parent header lookup proof in all headers db
+    // #4 - parent header's best chain digest
+    // #5 - parent header's best chain insert proof
+    // #6 - all headers insert proof
+    // #7 - new header's cumulative work as byte array
+    val contextVars: Map[Byte, EvaluatedValue[_ <: SType]] = Map(
+      1.toByte -> ByteArrayConstant(h2Bytes),
+      2.toByte -> ByteArrayConstant(insertH2BestRes.proof.bytes),
+      3.toByte -> ByteArrayConstant(h1LookupRes.proof.bytes),
+      4.toByte -> AvlTreeConstant(bestChainTree1),
+      5.toByte -> ByteArrayConstant(insertH2BestRes.proof.bytes),
+      6.toByte -> ByteArrayConstant(insertH2AllRes.proof.bytes),
+      7.toByte -> ByteArrayConstant(h2CumWork.toByteArray)
+    )
+
+    val inputs = IndexedSeq(new UnsignedInput(relayInput.id, ContextExtension(contextVars)))
+    val dataInputs = IndexedSeq.empty[DataInput]
+    val outputCandidates = IndexedSeq(relayOutput)
+
+    val unsignedTx = new UnsignedErgoTransaction(inputs, dataInputs, outputCandidates)
+
+    // no secrets needed
+    val prover = ErgoProvingInterpreter(IndexedSeq(), LaunchParameters)
+    val chainSettings = ChainSettingsReader.read("src/test/resources/application.conf").get
+    val genesisStateDigest: ADDigest = chainSettings.genesisStateDigest
+    val esc = ErgoStateContext.empty(genesisStateDigest, chainSettings, LaunchParameters)
+
+    prover.sign(unsignedTx, IndexedSeq(relayInput), IndexedSeq.empty, esc).get
+  }
+
+  property("Adding header to non-best chain w. switching") {
+    // add block 566,093 on top of 566,092, while best chain different
+
+    // best header atm
+    val h0Hex = "01000000076379e2c0ec4a614ad1bf0ec716e6873f2c7abac604a08cc78e070000000000579a6bbcd07e9c3d622672ad20495d4485b5233395ab4081db7cab0fd2b577d2396cec4c2a8b091b031a7313"
+    val h0Bytes = fromHex(h0Hex)
+    val h0Id = hash(h0Bytes)
+    val h0CumWork = new BigInteger("100500500500")
+    val h0Height = 566092
+    val h0HeaderAndHeight = h0Bytes ++ Longs.toByteArray(h0Height)
+
+    //566,092
+    val h1Hex = "00000020a82ff9c62e69a6cbed277b7f2a9ac9da3c7133a59a6305000000000000000000f6cd5708a6ba38d8501502b5b4e5b93627e8dcc9bd13991894c6e04ade262aa99582815c505b2e17479a751b"
+    val h1Bytes = fromHex(h1Hex)
+    val h1Id = hash(h1Bytes)
+    val h1Height = 566092
+    val h1HeaderAndHeight = h1Bytes ++ Longs.toByteArray(h1Height)
+
+    val h0PlasmaMap = new PlasmaMap[Array[Byte], Array[Byte]](AvlTreeFlags.InsertOnly, PlasmaParameters.default)
+    h0PlasmaMap.insert(h0Id -> h0HeaderAndHeight)
+    val h0Tree1 = h0PlasmaMap.ergoValue.getValue
+
+
+    val h1CumWork = new BigInteger("100500500600")
+    //566,093
+    val h2Hex = "00000020b45e33a345ad08ad2902cdd4101632fcbec009694b0c2500000000000000000016c99a795d8e0105d86f361341c7858d223fac261718bd608052822c5b4ae3cfd782815c505b2e17a56bb90b"
+    val h2Bytes = fromHex(h2Hex)
+    val h2Id = hash(h2Bytes)
+    val h2Height = h1Height + 1
+    val h2HeaderAndHeight = h2Bytes ++ Longs.toByteArray(h2Height)
+    val h2Nbits = Longs.fromByteArray(Array.fill(4)(0.toByte) ++ h2Bytes.slice(72, 76).reverse)
+    val h2CumWork = h1CumWork.add(getBlockWork(h2Nbits).bigInteger)
+
+    val bestChainPlasmaMap = new PlasmaMap[Array[Byte], Array[Byte]](AvlTreeFlags.InsertOnly, PlasmaParameters.default)
+    bestChainPlasmaMap.insert(h1Id -> h1HeaderAndHeight)
+    val bestChainTree1 = bestChainPlasmaMap.ergoValue.getValue
+
+    val allHeadersPlasmaMap = new PlasmaMap[Array[Byte], Array[Byte]](AvlTreeFlags.InsertOnly, PlasmaParameters.default)
+    val h1Record = h1HeaderAndHeight ++ bestChainTree1.digest.toArray ++ h1CumWork.toByteArray
+    val h0Record = h1HeaderAndHeight ++ h0Tree1.digest.toArray ++ h0CumWork.toByteArray
+    allHeadersPlasmaMap.insert(h1Id -> h1Record, h0Id -> h0Record)
+    val allHeadersTree1 = allHeadersPlasmaMap.ergoValue.getValue
+
+    val h1LookupRes = allHeadersPlasmaMap.lookUp(h1Id)
+
+    val relayInput = new ErgoBox (
+      value = 100000000L, // does not matter
+      ergoTree = Constants.btcRelayErgoTree,
+      Colls.fromItems((Digest32Coll @@ Colls.fromArray(relayNftId)) -> 1),
+      additionalRegisters = Map(
+        R4 -> AvlTreeConstant(h0Tree1),
+        R5 -> AvlTreeConstant(allHeadersTree1),
+        R6 -> IntConstant(h0Height),
+        R7 -> ByteArrayConstant(h0Id),
+        R8 -> BigIntConstant(h0CumWork)
+      ),
+      ModifierId @@ Base16.encode(h1Id),
+      0.toShort,
+      creationHeight = 0
+    )
+
+    val insertH2BestRes = bestChainPlasmaMap.insert(h2Id -> h2HeaderAndHeight)
+    val bestChainTree2 = bestChainPlasmaMap.ergoValue.getValue
+
+    val h2Record = h2HeaderAndHeight ++ bestChainTree2.digest.toArray ++ h2CumWork.toByteArray
+    val insertH2AllRes = allHeadersPlasmaMap.insert(h2Id -> h2Record)
+    val allHeadersTree2 = allHeadersPlasmaMap.ergoValue.getValue
+
+    val relayOutput = new ErgoBoxCandidate (
+      value = 100000000L, // does not matter
+      ergoTree = Constants.btcRelayErgoTree,
+      creationHeight = 0,
+      Colls.fromItems((Digest32Coll @@ Colls.fromArray(relayNftId)) -> 1),
+      additionalRegisters = Map(
+        R4 -> AvlTreeConstant(bestChainTree2),
+        R5 -> AvlTreeConstant(allHeadersTree2),
+        R6 -> IntConstant(h2Height),
+        R7 -> ByteArrayConstant(h2Id),
+        R8 -> BigIntConstant(h2CumWork)
+      )
+    )
 
     // #1 - new header bytes
     // #2 - best chain tree insert proof // if tip update
@@ -134,8 +247,120 @@ class BitcoinRelaySpec  extends AnyPropSpec with Matchers with TestHelpers {
 
   }
 
-  property("Adding header to non-best chain w. switching") {
+  property("Adding header to non-best chain w/out switching") {
+    // add block 566,093 on top of 566,092, while best chain different
+
+    // best header atm
+    val h0Hex = "01000000076379e2c0ec4a614ad1bf0ec716e6873f2c7abac604a08cc78e070000000000579a6bbcd07e9c3d622672ad20495d4485b5233395ab4081db7cab0fd2b577d2396cec4c2a8b091b031a7313"
+    val h0Bytes = fromHex(h0Hex)
+    val h0Id = hash(h0Bytes)
+    val h0CumWork = new BigInteger("100500500500000000000000") // <------- CUMULATIVE WORK CHANGED
+    val h0Height = 566092
+    val h0HeaderAndHeight = h0Bytes ++ Longs.toByteArray(h0Height)
+
+    //566,092
+    val h1Hex = "00000020a82ff9c62e69a6cbed277b7f2a9ac9da3c7133a59a6305000000000000000000f6cd5708a6ba38d8501502b5b4e5b93627e8dcc9bd13991894c6e04ade262aa99582815c505b2e17479a751b"
+    val h1Bytes = fromHex(h1Hex)
+    val h1Id = hash(h1Bytes)
+    val h1Height = 566092
+    val h1HeaderAndHeight = h1Bytes ++ Longs.toByteArray(h1Height)
+
+    val h0PlasmaMap = new PlasmaMap[Array[Byte], Array[Byte]](AvlTreeFlags.InsertOnly, PlasmaParameters.default)
+    h0PlasmaMap.insert(h0Id -> h0HeaderAndHeight)
+    val h0Tree1 = h0PlasmaMap.ergoValue.getValue
+
+
+    val h1CumWork = new BigInteger("100500500600")
+    //566,093
+    val h2Hex = "00000020b45e33a345ad08ad2902cdd4101632fcbec009694b0c2500000000000000000016c99a795d8e0105d86f361341c7858d223fac261718bd608052822c5b4ae3cfd782815c505b2e17a56bb90b"
+    val h2Bytes = fromHex(h2Hex)
+    val h2Id = hash(h2Bytes)
+    val h2Height = h1Height + 1
+    val h2HeaderAndHeight = h2Bytes ++ Longs.toByteArray(h2Height)
+    val h2Nbits = Longs.fromByteArray(Array.fill(4)(0.toByte) ++ h2Bytes.slice(72, 76).reverse)
+    val h2CumWork = h1CumWork.add(getBlockWork(h2Nbits).bigInteger)
+
+    val bestChainPlasmaMap = new PlasmaMap[Array[Byte], Array[Byte]](AvlTreeFlags.InsertOnly, PlasmaParameters.default)
+    bestChainPlasmaMap.insert(h1Id -> h1HeaderAndHeight)
+    val bestChainTree1 = bestChainPlasmaMap.ergoValue.getValue
+
+    val allHeadersPlasmaMap = new PlasmaMap[Array[Byte], Array[Byte]](AvlTreeFlags.InsertOnly, PlasmaParameters.default)
+    val h1Record = h1HeaderAndHeight ++ bestChainTree1.digest.toArray ++ h1CumWork.toByteArray
+    val h0Record = h1HeaderAndHeight ++ h0Tree1.digest.toArray ++ h0CumWork.toByteArray
+    allHeadersPlasmaMap.insert(h1Id -> h1Record, h0Id -> h0Record)
+    val allHeadersTree1 = allHeadersPlasmaMap.ergoValue.getValue
+
+    val h1LookupRes = allHeadersPlasmaMap.lookUp(h1Id)
+
+    val relayInput = new ErgoBox (
+      value = 100000000L, // does not matter
+      ergoTree = Constants.btcRelayErgoTree,
+      Colls.fromItems((Digest32Coll @@ Colls.fromArray(relayNftId)) -> 1),
+      additionalRegisters = Map(
+        R4 -> AvlTreeConstant(h0Tree1),
+        R5 -> AvlTreeConstant(allHeadersTree1),
+        R6 -> IntConstant(h0Height),
+        R7 -> ByteArrayConstant(h0Id),
+        R8 -> BigIntConstant(h0CumWork)
+      ),
+      ModifierId @@ Base16.encode(h1Id),
+      0.toShort,
+      creationHeight = 0
+    )
+
+    val insertH2BestRes = bestChainPlasmaMap.insert(h2Id -> h2HeaderAndHeight)
+    val bestChainTree2 = bestChainPlasmaMap.ergoValue.getValue
+
+    val h2Record = h2HeaderAndHeight ++ bestChainTree2.digest.toArray ++ h2CumWork.toByteArray
+    val insertH2AllRes = allHeadersPlasmaMap.insert(h2Id -> h2Record)
+    val allHeadersTree2 = allHeadersPlasmaMap.ergoValue.getValue
+
+    val relayOutput = new ErgoBoxCandidate (
+      value = 100000000L, // does not matter
+      ergoTree = Constants.btcRelayErgoTree,
+      creationHeight = 0,
+      Colls.fromItems((Digest32Coll @@ Colls.fromArray(relayNftId)) -> 1),
+      additionalRegisters = Map(
+        R4 -> AvlTreeConstant(h0Tree1),
+        R5 -> AvlTreeConstant(allHeadersTree2),
+        R6 -> IntConstant(h0Height),
+        R7 -> ByteArrayConstant(h0Id),
+        R8 -> BigIntConstant(h0CumWork)
+      )
+    )
+
+    // #1 - new header bytes
+    // #2 - best chain tree insert proof // if tip update
+    // #3 - parent header lookup proof in all headers db
+    // #4 - parent header's best chain digest
+    // #5 - parent header's best chain insert proof
+    // #6 - all headers insert proof
+    // #7 - new header's cumulative work as byte array
+    val contextVars: Map[Byte, EvaluatedValue[_ <: SType]] = Map(
+      1.toByte -> ByteArrayConstant(h2Bytes),
+      2.toByte -> ByteArrayConstant(insertH2BestRes.proof.bytes),
+      3.toByte -> ByteArrayConstant(h1LookupRes.proof.bytes),
+      4.toByte -> AvlTreeConstant(bestChainTree1),
+      5.toByte -> ByteArrayConstant(insertH2BestRes.proof.bytes),
+      6.toByte -> ByteArrayConstant(insertH2AllRes.proof.bytes),
+      7.toByte -> ByteArrayConstant(h2CumWork.toByteArray)
+    )
+
+    val inputs = IndexedSeq(new UnsignedInput(relayInput.id, ContextExtension(contextVars)))
+    val dataInputs = IndexedSeq.empty[DataInput]
+    val outputCandidates = IndexedSeq(relayOutput)
+
+    val unsignedTx = new UnsignedErgoTransaction(inputs, dataInputs, outputCandidates)
+
+    // no secrets needed
+    val prover = ErgoProvingInterpreter(IndexedSeq(), LaunchParameters)
+    val chainSettings = ChainSettingsReader.read("src/test/resources/application.conf").get
+    val genesisStateDigest: ADDigest = chainSettings.genesisStateDigest
+    val esc = ErgoStateContext.empty(genesisStateDigest, chainSettings, LaunchParameters)
+
+    prover.sign(unsignedTx, IndexedSeq(relayInput), IndexedSeq.empty, esc).get
 
   }
+
 
 }
