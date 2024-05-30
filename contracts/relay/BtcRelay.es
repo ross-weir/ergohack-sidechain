@@ -4,13 +4,17 @@
     // R5 - all headers tree
     // R6 - tip height
     // R7 - tip block id
+
     // R8 - tip cumulative work
     //
     // context vars:
     // #1 - new header bytes
-    // #2 - best chain tree insert proof
-    // #3 - parent header lookup proof for all headers db
-    // #4 - parent header's chain digest
+    // #2 - best chain tree insert proof // if tip update
+    // #3 - parent header lookup proof in all headers db
+    // #4 - parent header's best chain digest
+    // #5 - parent header's best chain insert proof
+    // #6 - all headers insert proof
+    // #7 - new header's cumulative work as byte array
 
     // id -> header (80 bytes) + height (8 bytes)
     val bestChainDigest = SELF.R4[AvlTree].get
@@ -64,7 +68,7 @@
     // todo: check diff change every 2016 blocks
 
     // best chain header record
-    val headerRow = (id, headerBytes ++ longToByteArray(tipHeight.toLong))
+    val headerRow = (id, headerBytes ++ longToByteArray(tipHeight.toLong + 1))
 
     val validTipUpdate = if(prevBlockId == tipHash) {
 
@@ -93,6 +97,8 @@
         val parentData = allHeadersDigest.get(prevBlockId, parentProof).get
 
         // todo: should we store first 80 bytes (header)? they are not used
+        val parentHeight = byteArrayToLong(parentData.slice(80, 88))
+
         val parentChainDigest = parentData.slice(88, 121)
 
         // todo: with AVL tree constructing options in 6.0, this getVar can be eliminated
@@ -106,7 +112,7 @@
         val allHeadersInsertProof = getVar[Coll[Byte]](6).get
         val cumWorkProvided = getVar[Coll[Byte]](7).get // todo: could be eliminated with BigInt serialization
 
-        val keyVal = (id, (headerBytes ++ updDigest ++ cumWorkProvided))
+        val keyVal = (id, (headerBytes ++ longToByteArray(parentHeight + 1) ++ updDigest ++ cumWorkProvided))
         val allHeadersDbUpdated = allHeadersDigest.insert(Coll(keyVal), allHeadersInsertProof).get
         val newAllHeadersDigestProvided = selfOut.R5[AvlTree].get
 
@@ -118,7 +124,6 @@
             // switch to better chain
 
             val outBestChainTree = selfOut.R4[AvlTree].get
-            val parentHeight = byteArrayToLong(parentData.slice(80, 88))
 
             val switchOk = outBestChainTree.digest == updDigest &&
                             outBestChainTree.enabledOperations == bestChainDigest.enabledOperations &&
