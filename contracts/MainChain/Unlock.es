@@ -1,7 +1,7 @@
 {
    // MainChain unlock contract.
    // ERGs are locked on main chain when locked in a box protected by this contract. The contract allows for
-   // unlocking ERGs
+   // unlocking ERGs when
 
    // registers:
    // R4 - sidechain's last data id (hash) during unlock start
