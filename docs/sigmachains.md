@@ -7,3 +7,10 @@ and consensus-related functionalities (such as Autolykos) in different environme
 * offchain contractual environments (such as offchain cash)
 * merged-mined sidechains
 * dedicated sigmachains (with trustless pegging)
+
+Let's consider what's needed for these settings briefly before jumping on details:
+
++for all the environments, changes in following entities would be needed, in most cases: 
+
+* Header, PreHeader types (SHeader, SPreHeader classes) which are specific to Ergo blockchain
+* Box (SBox) type which is a basic unit of storage on the Ergo blockchain
