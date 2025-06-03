@@ -14,3 +14,7 @@ Let's consider what's needed for these settings briefly before jumping on detail
 
 * Header, PreHeader types (SHeader, SPreHeader classes) which are specific to Ergo blockchain
 * Box (SBox) type which is a basic unit of storage on the Ergo blockchain
+* MinerPubkey and Height AST nodes
+* sigma.Context class
+
+along with projections into SigmaJS and compiler levels
