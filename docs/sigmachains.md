@@ -26,3 +26,14 @@ along with projections into SigmaJS and compiler levels
 It makes sense to tag all those context-dependent entities with a special (empty or almost empty) trait, to find them 
 easily. Then create special packages in all the modules with context-dependent entities. Then document what and how to 
 change in order to get programmable money for a new environment.
+
+Ergo node
+=========
+
+Ergo node modifications are not needed for offchain contractual environments, as such apps are not using blockchain.
+
+For merged mining setting, likely, current node API would be enough just. A merge mining client connected to a mining 
+node would use `/mining/candidateWithTxs` API method to include sidechain block data into mainchain transactions (
+as shown in [https://github.com/ross-weir/ergohack-sidechain/blob/main/docs/whitepaper/sidechain.pdf](https://github.com/ross-weir/ergohack-sidechain/blob/main/docs/whitepaper/sidechain.pdf), Section 2),
+along with existing methods to track blocks and transactions (e.g. ones available in `/blocks`).
+
