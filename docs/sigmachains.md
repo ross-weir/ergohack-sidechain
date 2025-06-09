@@ -48,4 +48,10 @@ Another option is Scala. Here it is possible, as with Rust, to just use Sigma (S
 / block structure from some existing cryptocurrency with client done in Scala. But in most cases a dedicated Sigmachain 
 implemented in Scala would derive from Ergo node code likely.
 
+For modifying Ergo node code, especially considering ongoing possibly deep changes needed for sub-blocks implementation, 
+we propose to proceed as follows:
 
+* mark Proof-of-Work related functionalities (PoW function / mining API etc) and move them to special packages to make 
+ PoW function change easy. In most cases, a dedicated Sigmachain would touch PoW function just.
+* explore what parts of other functionalities (block structure / predefined contracts / etc) are needed for dedicated 
+ Sigmachains, and plan further refactoring accordingly.
