@@ -35,5 +35,17 @@ Ergo node modifications are not needed for offchain contractual environments, as
 For merged mining setting, likely, current node API would be enough just. A merge mining client connected to a mining 
 node would use `/mining/candidateWithTxs` API method to include sidechain block data into mainchain transactions (
 as shown in [https://github.com/ross-weir/ergohack-sidechain/blob/main/docs/whitepaper/sidechain.pdf](https://github.com/ross-weir/ergohack-sidechain/blob/main/docs/whitepaper/sidechain.pdf), Section 2),
-along with existing methods to track blocks and transactions (e.g. ones available in `/blocks`).
+along with existing methods to track blocks and transactions (e.g. ones available in `/blocks`). Merged mining client 
+logic can be implemented using any technology stack then.
+
+A dedicated sigmachain can be built in Rust or Scala. In case of Rust based sigma-chain reference client implementation,
+ as currently only contractual layer is translated into Rust (sigma-rust framework), networking layer implementation 
+would be needed, it can be adopted from existing Proof-of-Work (and not only) cryptocurrencies implementations done 
+in Rust. This could be a good option to start a Sigma-powered blockchain which is similar, in regards with consensus 
+and/or block structure to ones having client implementation in Rust already. 
+
+Another option is Scala. Here it is possible, as with Rust, to just use Sigma (Scala implementation) and adopt consensus 
+/ block structure from some existing cryptocurrency with client done in Scala. But in most cases a dedicated Sigmachain 
+implemented in Scala would derive from Ergo node code likely.
+
 
